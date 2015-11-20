@@ -1,0 +1,69 @@
+.feed-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.feed-source-list, .feed-item-list {
+  flex: 0 0 17em;
+  border-right-style: solid;
+  border-width: 1px;
+  border-right-color: lightgrey;
+}
+
+.feed-source-list, .feed-source-list .list-group-item {
+  background: #EAE7D8;
+}
+
+.feed-item-list, .feed-item-list .list-group-item {
+  background: #F9F8F4;
+}
+
+.feed-content {
+  flex: 1;
+  padding-top: 5%;
+  padding-bottom: 5%;
+  padding-left: 10%;
+  padding-right: 10%;
+  background: #F8F7F5;
+}
+
+
+/* Customize Boostrap styles. */
+
+.list-special .list-group-item:first-child {
+  border-top-right-radius: 0px;
+  border-top-left-radius: 0px;
+}
+
+.borderless .list-group-item {
+  border: none;
+}
+
+.list-special .list-group-item:last-child {
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+.list-special.list-group {
+  margin-bottom: 0;
+}
+
+.feed-item-list .list-group-item:hover, .feed-item-list .list-group-item:focus {
+  background-color: #F0EEE8;
+}
+
+.feed-source-list .list-group-item:hover, .feed-source-list .list-group-item:focus {
+  background-color: #D4CEBE;
+}
+
+
+/* Responsive. */
+
+@media (max-width: 768px) {
+  .feed-container {
+    flex-direction: column;
+  }
+  .feed-source-list, .feed-item-list, .feed-content {
+    flex: auto;
+  }
+}

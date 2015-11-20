@@ -1,0 +1,36 @@
+{
+  "name": "readkey",
+  "version": "0.0.1",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "webpack-dev-server --hot --inline --progress --colors --history-api-fallback --port 8100",
+    "build": "webpack --progress --colors",
+    "prod": "webpack --progress --colors --optimize-minimize",
+    "test": "test"
+  },
+  "keywords": [
+    "keyword",
+    "rss",
+    "summary",
+    "read"
+  ],
+  "author": "Junjia He",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.2.1",
+    "babel-loader": "^6.2.0",
+    "babel-preset-es2015": "^6.1.18",
+    "css-loader": "^0.23.0",
+    "eslint": "^1.10.0",
+    "eslint-config-airbnb": "^1.0.0",
+    "eslint-plugin-react": "^3.9.0",
+    "file-loader": "^0.8.4",
+    "style-loader": "^0.13.0",
+    "webpack": "^1.12.6",
+    "webpack-dev-server": "^1.12.1"
+  },
+  "dependencies": {
+    "jquery": "^2.1.4"
+  }
+}
