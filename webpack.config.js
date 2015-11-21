@@ -3,6 +3,7 @@ module.exports = {
   entry: {
     javascript: './app.js',
     html: './index.html',
+    css: './style.css',
   },
 
   output: {
@@ -21,12 +22,8 @@ module.exports = {
         }
       },
       {
-        test: /\.html$/,
+        test: /\.html$|\.css$/,
         loader: 'file?name=[name].[ext]',
-      },
-      {
-        test: /\.css$/,
-        loader: 'style!css',
       },
     ],
   },
