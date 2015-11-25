@@ -18,8 +18,8 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel',
         query: {
-          presets:['es2015']
-        }
+          presets:['es2015'],
+        },
       },
       {
         test: /\.html$|\.css$/,
@@ -27,4 +27,18 @@ module.exports = {
       },
     ],
   },
-}
+  
+  devServer: {
+    proxy: {
+      '/subscription': {
+        target: 'http://localhost:8080',
+      },
+      '/subscription/*': {
+        target: 'http://localhost:8080',
+      },
+      '/feed/*': {
+        target: 'http://localhost:8080',
+      },
+    },
+  },
+};

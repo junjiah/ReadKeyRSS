@@ -2,49 +2,72 @@
 
 import $ from 'jquery';
 
-import { normalMockApi, longContentMockApi } from './mock-api.js';
+import { readKeyMockApi, readKeyApi } from './api.js'; 
 
-// let api = normalMockApi;
-let api = longContentMockApi;
+// For local development.
+let api = readKeyMockApi;
 
 function attachFeedSourceList(subs) {
-  // let subList = $();
-  // subs.subscriptions.forEach(sub => {
+  if (!subs) {
+    return;
+  }
   const subList = subs.subscriptions.reduce((acc, sub) => {
-    let ele = $(`<a href="#" class="list-group-item">${sub.title}</a>`);
+    const id = sub.id;
+    let ele = $(`<a class="list-group-item">${sub.title}</a>`);
     if (sub.unreadCount > 0) {
       ele = ele.append(`<span class="badge">${sub.unreadCount}</span>`);
     }
     ele.click(() => {
-      attachFeedItemList(sub.id);
+      attachFeedEntries(id);
     });
     return acc.add(ele);
   }, $());
   
-  $('.feed-source-list')
+  $('#feed-source-list-data')
     .empty()
     .append(subList);
 }
 
-function attachFeedItemList(subId) {
+function attachFeedEntries(subId) {
   const done = data => {
     const itemList = data.feeds.reduce((acc, item) => {
+      const id = item.id;
+      const title = item.title;
       let ele = $(`
-        <a href="#" class="list-group-item">
-          <h5 class="list-group-item-heading">${item.title}</h5>
+        <a class="list-group-item">
+          <h5 class="list-group-item-heading">${title}</h5>
           <p class="list-group-item-text">${item.summary}</p>
         </a>
       `);
+      ele.click(() => {
+        attachFeedItem(id, title);
+      });
       return acc.add(ele);
     }, $());
     
-    $('.feed-item-list')
+    $('#feed-item-list-data')
       .empty()
       .append(itemList);
   };
-  const fail = () => { alert('get feeds failed.'); };
+  const fail = () => { alert('get feed entries failed.'); };
   
-  api.getFeeds(subId, done, fail);
+  api.getFeedEntries(subId, done, fail);
+}
+
+function attachFeedItem(feedId, feedTitle) {
+  const done = data => {
+    const titleEle = $(`<h1><a href="${data.link}">${feedTitle}</a></h1>`);
+
+    $('#feed-title')
+      .empty()
+      .append(titleEle);
+    $('#feed-content')
+      .empty()
+      .append(data.content);
+  };
+  const fail = () => { alert('get feed item failed.'); };
+  
+  api.getFeed(feedId, done, fail);
 }
 
 // When document is ready.
