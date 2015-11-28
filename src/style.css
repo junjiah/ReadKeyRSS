@@ -2,8 +2,14 @@
   display: flex;
 }
 
-.feed-source-list, .feed-item-list {
-  flex: 0 0 17em;
+.feed-source-list {
+  flex: 0 0 15em;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.feed-item-list {
+  flex: 0 0 19em;
   height: 100vh;
   overflow-y: auto;
 }
@@ -27,7 +33,7 @@
   position: fixed;
   padding: 12px;
   bottom: 0px;
-  width: 17em;
+  width: 15em;
   height: 38px;
   border-top: 1px solid #DAD6C8;
 }
@@ -43,9 +49,9 @@
   position: fixed;
   padding: 12px;
   bottom: 0px;
-  width: 17em;
+  width: 19em;
   height: 38px;
-  border-top: 1px solid #EBEAE9;  
+  border-top: 1px solid #EBEAE9;
 }
 
 #feed-item-list-footer-info {
@@ -74,7 +80,8 @@
 #feed-content {
   font-size: 11pt;
   padding-top: 12px;
-  padding-bottom: 12px;
+  /* Should not be blocked by the footer. */
+  padding-bottom: 60px;
   margin-left: 12%;
   margin-right: 12%;
 }
@@ -114,11 +121,11 @@
   margin-bottom: 0;
 }
 
-.feed-source-list .list-group-item:hover, .feed-source-list .list-group-item:focus {
+.feed-source-list .list-group-item:hover, .feed-source-list .list-group-item.focused {
   background-color: #D4CEBE;
 }
 
-.feed-item-list .list-group-item:hover, .feed-item-list .list-group-item:focus {
+.feed-item-list .list-group-item:hover, .feed-item-list .list-group-item.focused {
   background-color: #F0EEE8;
 }
 
