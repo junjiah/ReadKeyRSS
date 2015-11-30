@@ -13,6 +13,7 @@ const globalObj = {
 };
 // For local development.
 let api = readKeyMockApi;
+api = readKeyApi;
 
 /***************************************************************
  * Custom elements.
@@ -99,21 +100,25 @@ function attachFeedEntries(subId) {
 // Event handler for clicking on feed entry.
 function attachFeedItem(feedId, feedTitle) {
   const done = data => {
-    const titleEle = $(`<h1><a href="${data.link}">${feedTitle}</a></h1>`);
+    const titleEle = $(`<h1><a href="${data.link}" target="_blank">${feedTitle}</a></h1>`);
+    const contentEle = $(data.content);
+    // Let each link open in a new tab/window.
+    contentEle.find('a').attr('target', '_blank');
 
     $('#feed-title')
       .empty()
       .append(titleEle);
     $('#feed-content')
       .empty()
-      .append(data.content);
+      .append(contentEle);
   };
   const fail = () => { alert('get feed item failed.'); };
 
   api.getFeed(feedId, done, fail);
 }
 
-function subscribe() {
+function subscribe(e) {
+  e.preventDefault();
   const inputEle = $('#add-subscription-input');
   let url = inputEle.val();
   // TODO: Check whether the URL makes sense.
@@ -125,6 +130,8 @@ function subscribe() {
   };
   const fail = () => { alert('subscribe failed.'); };
   api.subscribeFeedSource(url, done, fail);
+
+  $('#add-subscription-modal').modal('hide');
 }
 
 /***************************************************************
@@ -133,8 +140,12 @@ function subscribe() {
  
 // When document is ready.
 $(() => {
-  // Event handler for the subscription adding button.
+  // Event handler for the subscription adding modal.
   $('#add-subscription-button').click(subscribe);
+  $('#add-subscription-form').submit(subscribe);
+  $('#add-subscription-modal').on('shown.bs.modal', () => {
+    $('#add-subscription-input').focus();
+  });
   
   // Fetch subscription list.
   const fail = () => { alert('get subscriptions failed.'); };

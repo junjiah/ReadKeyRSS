@@ -1,3 +1,25 @@
+/* Global styles. */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "helvetica neue", "hiragino sans gb", "stheiti", "microsoft yahei", tahoma, sans-serif !important;
+}
+
+hr {
+  border-top: 2px solid #ccc;
+}
+
+
+/* ReadKey styles. */
+
+#readkey-logo {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 48px;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
 .feed-container {
   display: flex;
 }
@@ -6,12 +28,16 @@
   flex: 0 0 15em;
   height: 100vh;
   overflow-y: auto;
+  /* Should not be blocked by the footer. */
+  padding-bottom: 38px;
 }
 
 .feed-item-list {
   flex: 0 0 19em;
   height: 100vh;
   overflow-y: auto;
+  /* Should not be blocked by the footer. */
+  padding-bottom: 38px;
 }
 
 .feed-source-list, #feed-source-list-footer {
@@ -68,22 +94,60 @@
 #feed-title {
   padding-top: 12px;
   padding-bottom: 12px;
-  margin-left: 12%;
-  margin-right: 12%;
+  margin-left: 18%;
+  margin-right: 18%;
 }
 
 #feed-title a {
+  /* The whole title is inside the anchor tag. */
   text-decoration: none;
   color: #42413F;
+  font-weight: 700;
+  font-size: 30px;
 }
 
+
+/* Handle content styles. */
+
 #feed-content {
-  font-size: 11pt;
+  font-size: 15px;
   padding-top: 12px;
   /* Should not be blocked by the footer. */
   padding-bottom: 60px;
-  margin-left: 12%;
-  margin-right: 12%;
+  margin-left: 18%;
+  margin-right: 18%;
+}
+
+#feed-content p, #feed-content img {
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
+
+#feed-content img {
+  /* TODO: Make images more adaptive. */
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#feed-content h2 {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#feed-content blockquote {
+  font-size: 15px;
+}
+
+#feed-content p {
+  line-height: 170% !important;
+}
+
+#feed-content a {
+  font-weight: bold !important;
+  color: #3F3D3B !important;
+  text-decoration: underline !important;
 }
 
 #feed-item-footer {

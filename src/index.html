@@ -16,16 +16,18 @@
 <body>
   <div class="feed-container">
     <div class="feed-source-list">
+      <div id="readkey-logo">LOGO</div>
       <div id="feed-source-list-data" class="list-group list-special borderless"></div>
       <footer id="feed-source-list-footer">
         <span id="feed-source-list-refresh" class="glyphicon glyphicon-refresh" aria-hidden="false"></span>
-        <span id="feed-source-list-add" class="glyphicon glyphicon-plus" aria-hidden="true" data-toggle="modal" data-target="#add-subscription-modal"></span>
+        <span id="feed-source-list-add" class="glyphicon glyphicon-plus" aria-hidden="true" data-toggle="modal"
+        data-target="#add-subscription-modal"></span>
       </footer>
     </div>
     <div class="feed-item-list">
       <div id="feed-item-list-data" class="list-group list-special borderless"></div>
       <footer id="feed-item-list-footer">
-        <span id="feed-item-list-footer-info">20 items</span>
+        <span id="feed-item-list-footer-info"></span>
       </footer>
     </div>
     <div class="feed-item">
@@ -45,11 +47,15 @@
           <h4 class="modal-title" id="subscription-modal-title">Add Subscription</h4>
         </div>
         <div class="modal-body">
-          <input id="add-subscription-input" type="text" class="form-control">
+          <form id="add-subscription-form" role="form">
+            <div class="form-group">
+              <input id="add-subscription-input" type="text" class="form-control">
+            </div>
+          </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" id="add-subscription-button" class="btn btn-primary" data-dismiss="modal">Add</button>
+          <button type="button" id="add-subscription-button" class="btn btn-primary">Add</button>
         </div>
       </div>
     </div>
