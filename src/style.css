@@ -209,6 +209,11 @@ hr {
   background-color: #F0EEE8;
 }
 
+.list-group-item img {
+  height: 40px;
+  width: 40px;
+}
+
 
 /* Responsive. */
 

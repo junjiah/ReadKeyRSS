@@ -3,20 +3,18 @@
 
 import 'babel-polyfill';
 
-import { readKeyMockApi, readKeyApi } from './api.js';
+// For local development.
+import api from './mock-api.js';
 
 /***************************************************************
  * Global objects.
  ***************************************************************/
 
 const globalObj = {
-  // Focused feed-related records of type `{ ele, id }`.
+  // Focused feed-related records of type `{ $ele, id }`.
   focusedFeedSource: null,
   focusedFeedEntry: null,
 };
-// For local development.
-let api = readKeyMockApi;
-api = readKeyApi;
 
 /***************************************************************
  * Custom elements and element operations.
@@ -25,51 +23,65 @@ api = readKeyApi;
 function buildFeedSourceElement(sub) {
   const id = sub.id;
   // Let the anchor behave like normal ones without href.
-  let ele = $(`<a class="list-group-item">${sub.title}</a>`);
+  let $ele = $(`<a class="list-group-item">${sub.title}</a>`);
   // Reset globally focused element.
   if (globalObj.focusedFeedSource && globalObj.focusedFeedSource.id === id) {
-    ele.addClass('focused');
-    globalObj.focusedFeedSource.ele = ele;
+    $ele.addClass('focused');
+    globalObj.focusedFeedSource.$ele = $ele;
   }
 
-  ele.click(() => {
+  $ele.click(() => {
     showLogoAsFeedContent();
     attachFeedEntries(id);
     if (globalObj.focusedFeedSource) {
-      globalObj.focusedFeedSource.ele.removeClass('focused');
+      globalObj.focusedFeedSource.$ele.removeClass('focused');
     }
-    ele.addClass('focused');
-    globalObj.focusedFeedSource = { ele, id };
+    $ele.addClass('focused');
+    globalObj.focusedFeedSource = { $ele, id };
   });
-  return ele;
+  return $ele;
 }
 
 function buildFeedEntryElement(item) {
   const id = item.id;
   const title = item.title;
+
   // Let the anchor behave like normal ones without href.
-  let ele = $(`
+  let $ele = $(`
         <a class="list-group-item">
+          <img class="pull-right" />
           <h5 class="list-group-item-heading">${title}</h5>
           <p class="list-group-item-text">${item.summary}</p>
         </a>
       `);
-  // Reset globally focused element.
+  $ele.find('img').attr('src', require('../assets/checkmark.svg'));
+  // Regain globally focused element.
   if (globalObj.focusedFeedEntry && globalObj.focusedFeedEntry.id === id) {
-    ele.addClass('focused');
-    globalObj.focusedFeedEntry.ele = ele;
+    $ele.addClass('focused');
+    globalObj.focusedFeedEntry.$ele = $ele;
   }
 
-  ele.click(() => {
+  $ele.click((e) => {
+    if (e.target.tagName == 'IMG') {
+      // Clicking the checkmark, mark as read.
+      markAsRead({ itemId: id, $ele });
+      // Remove global record if matches.
+      if (globalObj.focusedFeedEntry && globalObj.focusedFeedEntry.id === id) {
+        globalObj.focusedFeedEntry = null;
+      }
+      return;
+    };
+    
+    // Otherwise, regard as normal clicking to attach feed item.
     // TODO: Maybe these should be fetched before clicking.
     attachFeedItem(id, title);
     if (globalObj.focusedFeedEntry) {
-      globalObj.focusedFeedEntry.ele.removeClass('focused');
+      globalObj.focusedFeedEntry.$ele.removeClass('focused');
     }
-    ele.addClass('focused');
-    globalObj.focusedFeedEntry = { ele, id };
+    $ele.addClass('focused');
+    globalObj.focusedFeedEntry = { $ele, id };
   });
-  return ele;
+  return $ele;
 }
 
 function showLogoAsFeedContent() {
@@ -84,17 +96,17 @@ function updateUnreadCount(len) {
   $('#feed-item-list-footer-info')
     .text(`${len} item${len > 1 ? 's' : ''}`);
   if (globalObj.focusedFeedSource) {
-    const ele = globalObj.focusedFeedSource.ele;
-    const badge = ele.find('span');
-    if (badge.length == 0) {
+    const $ele = globalObj.focusedFeedSource.$ele;
+    const $badge = $ele.find('span.badge');
+    if ($badge.length == 0) {
       if (len > 0) {
-        ele.append(`<span class="badge">${len}</span>`);
+        $ele.append(`<span class="badge">${len}</span>`);
       }
     } else {
       if (len == 0) {
-        badge.remove();
+        $badge.remove();
       } else {
-        badge.text(len);
+        $badge.text(String(len));
       }
     }
   }
@@ -160,17 +172,17 @@ function attachFeedEntries(subId) {
 function attachFeedItem(feedId, feedTitle) {
   return new Promise((resolve, reject) => {
     const done = data => {
-      const titleEle = $(`<h1><a href="${data.link}" target="_blank">${feedTitle}</a></h1>`);
-      const contentEle = $(data.content);
+      const $titleEle = $(`<h1><a href="${data.link}" target="_blank">${feedTitle}</a></h1>`);
+      const $contentEle = $(data.content);
       // Let each link open in a new tab/window.
-      contentEle.find('a').attr('target', '_blank');
+      $contentEle.find('a').attr('target', '_blank');
 
       $('#feed-title')
         .empty()
-        .append(titleEle);
+        .append($titleEle);
       $('#feed-content')
         .empty()
-        .append(contentEle);
+        .append($contentEle);
 
       resolve();
     };
@@ -185,14 +197,14 @@ function attachFeedItem(feedId, feedTitle) {
 
 function subscribe(e) {
   e.preventDefault();
-  const inputEle = $('#add-subscription-input');
-  let url = inputEle.val();
+  const $inputEle = $('#add-subscription-input');
+  let url = $inputEle.val();
   $('#add-subscription-modal').modal('hide');
   // TODO: Check whether the URL makes sense.
   return new Promise((resolve, reject) => {
     const done = sub => {
       // Clear input's value.
-      inputEle.val('');
+      $inputEle.val('');
       $('#feed-source-list-data')
         .append(buildFeedSourceElement(sub));
 
@@ -206,19 +218,18 @@ function subscribe(e) {
   });
 }
 
-function markAsRead() {
-  // Ignore if no focused item.
-  if (!globalObj.focusedFeedSource || !globalObj.focusedFeedEntry) {
+function markAsRead({ itemId, $ele }) {
+  // Ignore if no focused feed source.
+  if (!globalObj.focusedFeedSource) {
     return;
   }
   const subId = globalObj.focusedFeedSource.id;
-  const itemId = globalObj.focusedFeedEntry.id;
   const read = true;
+
   return new Promise((resolve, reject) => {
     const done = () => {
       showLogoAsFeedContent();
-      globalObj.focusedFeedEntry.ele.remove();
-      globalObj.focusedFeedEntry = null;
+      $ele.remove();
 
       updateUnreadCount($('#feed-item-list-data').children().length);
 
@@ -255,7 +266,17 @@ $(() => {
   // Event handler for the refreshing button.
   $('#feed-source-list-refresh').click(refresh);
   // Event handler for the mark read button.
-  $('#feed-item-mark-read').click(markAsRead);
+  $('#feed-item-mark-read').click(e => {
+    if (!globalObj.focusedFeedEntry) {
+      return;
+    }
+    const feedEntry = {
+      itemId: globalObj.focusedFeedEntry.id,
+      $ele: globalObj.focusedFeedEntry.$ele,
+    };
+    globalObj.focusedFeedEntry = null;
+    markAsRead(feedEntry);
+  });
 
   // Adjust dynamic UI issues.
   // TODO: Seems unstable.
