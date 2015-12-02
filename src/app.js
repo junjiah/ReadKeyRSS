@@ -19,16 +19,13 @@ let api = readKeyMockApi;
 api = readKeyApi;
 
 /***************************************************************
- * Custom elements.
+ * Custom elements and element operations.
  ***************************************************************/
 
 function buildFeedSourceElement(sub) {
   const id = sub.id;
   // Let the anchor behave like normal ones without href.
   let ele = $(`<a class="list-group-item">${sub.title}</a>`);
-  if (sub.unreadCount > 0) {
-    ele = ele.append(`<span class="badge">${sub.unreadCount}</span>`);
-  }
   // Reset globally focused element.
   if (globalObj.focusedFeedSource && globalObj.focusedFeedSource.id === id) {
     ele.addClass('focused');
@@ -36,6 +33,7 @@ function buildFeedSourceElement(sub) {
   }
 
   ele.click(() => {
+    showLogoAsFeedContent();
     attachFeedEntries(id);
     if (globalObj.focusedFeedSource) {
       globalObj.focusedFeedSource.ele.removeClass('focused');
@@ -63,6 +61,7 @@ function buildFeedEntryElement(item) {
   }
 
   ele.click(() => {
+    // TODO: Maybe these should be fetched before clicking.
     attachFeedItem(id, title);
     if (globalObj.focusedFeedEntry) {
       globalObj.focusedFeedEntry.ele.removeClass('focused');
@@ -71,6 +70,34 @@ function buildFeedEntryElement(item) {
     globalObj.focusedFeedEntry = { ele, id };
   });
   return ele;
+}
+
+function showLogoAsFeedContent() {
+  $('#feed-title')
+    .empty();
+  $('#feed-content')
+    .empty();
+  // TODO: Add logo.
+}
+
+function updateUnreadCount(len) {
+  $('#feed-item-list-footer-info')
+    .text(`${len} item${len > 1 ? 's' : ''}`);
+  if (globalObj.focusedFeedSource) {
+    const ele = globalObj.focusedFeedSource.ele;
+    const badge = ele.find('span');
+    if (badge.length == 0) {
+      if (len > 0) {
+        ele.append(`<span class="badge">${len}</span>`);
+      }
+    } else {
+      if (len == 0) {
+        badge.remove();
+      } else {
+        badge.text(len);
+      }
+    }
+  }
 }
 
 /***************************************************************
@@ -112,9 +139,7 @@ function attachFeedEntries(subId) {
         return acc.add(buildFeedEntryElement(item));
       }, $());
 
-      let len = data.feeds.length;
-      $('#feed-item-list-footer-info')
-        .text(`${len} item${len > 1 ? 's' : ''}`);
+      updateUnreadCount(data.feeds.length);
 
       $('#feed-item-list-data')
         .empty()
@@ -181,6 +206,32 @@ function subscribe(e) {
   });
 }
 
+function markAsRead() {
+  // Ignore if no focused item.
+  if (!globalObj.focusedFeedSource || !globalObj.focusedFeedEntry) {
+    return;
+  }
+  const subId = globalObj.focusedFeedSource.id;
+  const itemId = globalObj.focusedFeedEntry.id;
+  const read = true;
+  return new Promise((resolve, reject) => {
+    const done = () => {
+      showLogoAsFeedContent();
+      globalObj.focusedFeedEntry.ele.remove();
+      globalObj.focusedFeedEntry = null;
+
+      updateUnreadCount($('#feed-item-list-data').children().length);
+
+      resolve();
+    };
+    const fail = () => {
+      alert('mark as read failed.');
+      reject();
+    };
+    api.markRead({ subId, itemId, read }, done, fail);
+  });
+}
+
 /***************************************************************
  * Preparation when document is ready.
  ***************************************************************/
@@ -203,6 +254,14 @@ $(() => {
   });
   // Event handler for the refreshing button.
   $('#feed-source-list-refresh').click(refresh);
+  // Event handler for the mark read button.
+  $('#feed-item-mark-read').click(markAsRead);
+
+  // Adjust dynamic UI issues.
+  // TODO: Seems unstable.
+  const feedItemWidth = $(document).width() - $('.feed-item-list').width() - $('.feed-source-list').width();
+  $('#feed-item-header').width(feedItemWidth);
+  $('#feed-item-footer').width(feedItemWidth);
 
   // Init page loading.
   refresh();

@@ -16,26 +16,33 @@ const apiStatus = Object.freeze({
   getFeedEntries: 200,
   getFeed: 200,
   subscribeFeedSource: 200,
+  markRead: 200,
 });
 const latency = 100;
 let feedSourceNum = 10;
 const readKeyMockApi = Object.freeze({
   getSubscriptions(done, fail) {
     if (apiStatus.getSubscriptions != 200) {
-      setTimeout(fail.bind(undefined, { responseText: 'getSubscriptions error.', status: apiStatus }), latency);
+      setTimeout(fail.bind(undefined, {
+        responseText: 'getSubscriptions error.',
+        status: apiStatus.getSubscriptions,
+      }), latency);
       return;
     }
 
     let subs = [];
     for (let i = 0; i < feedSourceNum; i++) {
-      subs.push({ id: i, title: `sub${i}`, unreadCount: i });
+      subs.push({ id: i, title: `sub${i}` });
     }
     setTimeout(done.bind(undefined, { subscriptions: subs }), latency);
   },
 
   getFeedEntries(subId, done, fail) {
     if (apiStatus.getFeedEntries != 200) {
-      setTimeout(fail.bind(undefined, { responseText: 'getFeedEntries error.', status: apiStatus }), latency);
+      setTimeout(fail.bind(undefined, {
+        responseText: 'getFeedEntries error.',
+        status: apiStatus.getFeedEntries,
+      }), latency);
       return;
     }
 
@@ -55,7 +62,10 @@ const readKeyMockApi = Object.freeze({
 
   getFeed(feedId, done, fail) {
     if (apiStatus.getFeed != 200) {
-      setTimeout(fail.bind(undefined, { responseText: 'getFeed error.', status: apiStatus }), latency);
+      setTimeout(fail.bind(undefined, { 
+        responseText: 'getFeed error.', 
+        status: apiStatus.getFeed, 
+      }), latency);
       return;
     }
 
@@ -73,14 +83,28 @@ const readKeyMockApi = Object.freeze({
 
   subscribeFeedSource(url, done, fail) {
     if (apiStatus.subscribeFeedSource != 200) {
-      setTimeout(fail.bind(undefined, { responseText: 'subscribe error.', status: apiStatus }), latency);
+      setTimeout(fail.bind(undefined, { 
+        responseText: 'subscribe error.', 
+        status: apiStatus.subscribeFeedSource, 
+      }), latency);
       return;
     }
     // Update number of feed sources.
     feedSourceNum++;
     let id = feedSourceNum - 1;
-    const result = Object.freeze({ id: id, title: `sub${id}`, unreadCount: id });
+    const result = Object.freeze({ id: id, title: `sub${id}` });
     setTimeout(done.bind(undefined, result), latency);
+  },
+
+  markRead({subId, itemId, read}, done, fail) {
+    if (apiStatus.markRead != 200) {
+      setTimeout(fail.bind(undefined, { 
+        responseText: 'markRead error.', 
+        status: apiStatus.markRead, 
+      }), latency);
+    }
+    
+    setTimeout(done, latency);
   },
 });
 
@@ -116,6 +140,14 @@ const readKeyApi = Object.freeze({
       url: `${apiPrefix}/subscription`,
       data: `url=${url}`,
     }).done(done).fail(fail);
+  },
+
+  markRead({subId, itemId, read}, done, fail) {
+    $.ajax({
+      type: 'PUT',
+      url: `${apiPrefix}/subscription/${subId}`,
+      data: `itemId=${itemId}&read=${read}`,
+    }).done(done).fail(fail);    
   },
 });
 
