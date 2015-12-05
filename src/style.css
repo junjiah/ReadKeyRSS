@@ -84,6 +84,10 @@ hr {
   font-size: 8px;
 }
 
+.feed-item-list .list-group-item-heading {
+  font-weight: 600;
+}
+
 .feed-item {
   flex: 1;
   background: #F8F7F5;

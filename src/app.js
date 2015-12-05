@@ -1,4 +1,5 @@
 /* global $ */
+/* eslint-env node */
 'use strict';
 
 import 'babel-polyfill';
@@ -20,6 +21,20 @@ const globalObj = {
  * Custom elements and element operations.
  ***************************************************************/
 
+function showUnreadBadge($ele, subId) {
+  const done = cnt => {
+    const len = Number(cnt);
+    const $badge = $ele.find('span.badge');
+    if ($badge.length == 0 && len > 0) {
+      $ele.append(`<span class="badge">${len}</span>`);
+    }
+    // TODO: If no unread item, should the feed source element be removed?
+  };
+  // Ignore errors.
+  const fail = () => { };
+  api.getUnreadCount({ subId }, done, fail);
+}
+
 function buildFeedSourceElement(sub) {
   const id = sub.id;
   // Let the anchor behave like normal ones without href.
@@ -39,19 +54,23 @@ function buildFeedSourceElement(sub) {
     $ele.addClass('focused');
     globalObj.focusedFeedSource = { $ele, id };
   });
+  
+  showUnreadBadge($ele, id);
   return $ele;
 }
 
 function buildFeedEntryElement(item) {
   const id = item.id;
   const title = item.title;
+  let keywords = item.keywords.split(',').join(', ');
 
   // Let the anchor behave like normal ones without href.
+  // TODO: Center the checkmark.
   let $ele = $(`
         <a class="list-group-item">
           <img class="pull-right" />
           <h5 class="list-group-item-heading">${title}</h5>
-          <p class="list-group-item-text">${item.summary}</p>
+          <p class="list-group-item-text feed-entry-keywords">${keywords}</p>
         </a>
       `);
   $ele.find('img').attr('src', require('../assets/checkmark.svg'));
@@ -70,7 +89,7 @@ function buildFeedEntryElement(item) {
         globalObj.focusedFeedEntry = null;
       }
       return;
-    };
+    }
     
     // Otherwise, regard as normal clicking to attach feed item.
     // TODO: Maybe these should be fetched before clicking.
@@ -246,17 +265,17 @@ function markAsRead({ itemId, $ele }) {
 /***************************************************************
  * Preparation when document is ready.
  ***************************************************************/
+
+function refresh() {
+  console.log('refresh');
+  attachFeedSourceList();
+  if (globalObj.focusedFeedSource) {
+    attachFeedEntries(globalObj.focusedFeedSource.id);
+  }
+} 
  
 // When document is ready.
 $(() => {
-  // Fetch subscription list.
-  const refresh = () => {
-    attachFeedSourceList();
-    if (globalObj.focusedFeedSource) {
-      attachFeedEntries(globalObj.focusedFeedSource.id);
-    }
-  };
-
   // Event handler for the subscription adding modal.
   $('#add-subscription-button').click(subscribe);
   $('#add-subscription-form').submit(subscribe);
@@ -266,7 +285,7 @@ $(() => {
   // Event handler for the refreshing button.
   $('#feed-source-list-refresh').click(refresh);
   // Event handler for the mark read button.
-  $('#feed-item-mark-read').click(e => {
+  $('#feed-item-mark-read').click(() => {
     if (!globalObj.focusedFeedEntry) {
       return;
     }

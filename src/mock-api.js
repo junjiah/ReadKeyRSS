@@ -15,6 +15,7 @@ const apiStatus = Object.freeze({
   getFeed: 200,
   subscribeFeedSource: 200,
   markRead: 200,
+  getUnreadCount: 200,
 });
 const latency = 100;
 let feedSourceNum = 10;
@@ -50,11 +51,9 @@ const readKeyMockApi = Object.freeze({
     // Add one unusual feed source with 100 entries.
     let itemNum = subId == feedSourceNum - 1 ? 100 : subId;
     for (let i = 0; i < itemNum; i++) {
-      const summary = lorem(getRandomInt(10, 30));
       items.push({
         id: subId * 100 + i,
         title: `sub${subId}-item${i}`,
-        summary: summary,
         keywords: `kw${i},keyword${i},关键词${i},キーワード${i}`,
       });
     }
@@ -63,9 +62,9 @@ const readKeyMockApi = Object.freeze({
 
   getFeed(feedId, done, fail) {
     if (apiStatus.getFeed != 200) {
-      setTimeout(fail.bind(undefined, { 
-        responseText: 'getFeed error.', 
-        status: apiStatus.getFeed, 
+      setTimeout(fail.bind(undefined, {
+        responseText: 'getFeed error.',
+        status: apiStatus.getFeed,
       }), latency);
       return;
     }
@@ -84,9 +83,9 @@ const readKeyMockApi = Object.freeze({
 
   subscribeFeedSource(url, done, fail) {
     if (apiStatus.subscribeFeedSource != 200) {
-      setTimeout(fail.bind(undefined, { 
-        responseText: 'subscribe error.', 
-        status: apiStatus.subscribeFeedSource, 
+      setTimeout(fail.bind(undefined, {
+        responseText: 'subscribe error.',
+        status: apiStatus.subscribeFeedSource,
       }), latency);
       return;
     }
@@ -100,13 +99,26 @@ const readKeyMockApi = Object.freeze({
 
   markRead({subId, itemId, read}, done, fail) {
     if (apiStatus.markRead != 200) {
-      setTimeout(fail.bind(undefined, { 
-        responseText: 'markRead error.', 
-        status: apiStatus.markRead, 
+      setTimeout(fail.bind(undefined, {
+        responseText: 'markRead error.',
+        status: apiStatus.markRead,
       }), latency);
     }
-    
+
     setTimeout(done, latency);
+  },
+
+  getUnreadCount({subId}, done, fail) {
+    if (apiStatus.getUnreadCount != 200) {
+      setTimeout(fail.bind(undefined, {
+        responseText: 'getUnreadCount error.',
+        status: apiStatus.getUnreadCount,
+      }), latency);
+      return;
+    }
+
+    const result = getRandomInt(0, 5);
+    setTimeout(done.bind(undefined, String(result)), latency);
   },
 });
 

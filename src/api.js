@@ -42,6 +42,13 @@ const readKeyApi = Object.freeze({
       data: `itemId=${itemId}&read=${read}`,
     }).done(done).fail(fail);    
   },
+  
+  getUnreadCount({subId}, done, fail) {
+    $.ajax({
+      type: 'GET',
+      url: `${apiPrefix}/unreadcount/${subId}`,
+    }).done(done).fail(fail);
+  },
 });
 
 export default readKeyApi;

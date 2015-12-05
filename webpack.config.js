@@ -43,6 +43,9 @@ module.exports = {
       '/feed/*': {
         target: 'http://localhost:8080',
       },
+      '/unreadcount/*': {
+        target: 'http://localhost:8080',
+      },
     },
   },
 };
