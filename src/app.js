@@ -18,6 +18,44 @@ const globalObj = {
 };
 
 /***************************************************************
+ * Helper functions.
+ ***************************************************************/
+
+// Credits to: 
+// http://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript
+function isValidDate(date) {
+  if (Object.prototype.toString.call(date) !== "[object Date]")
+    return false;
+  return !isNaN(date.getTime());
+}
+
+
+// A helper function receiving a Date object (usually in UTC) and transform to
+// the string of format 'yyyy-mm-dd hh:mm:ss' in local time.
+function formatDate(date) {
+  // Wrap date attributes which should be padded to two digits.
+  let wrap = {
+    month: date.getMonth(),
+    date: date.getDate(),
+    hour: date.getHours(),
+    minute: date.getMinutes(),
+    second: date.getSeconds(),
+  };
+  // Add padding.
+  for (let attr in wrap) {
+    let val = wrap[attr];
+    if (val < 10) {
+      wrap[attr] = '0' + val;
+    }
+  }
+
+  const day = `${date.getFullYear() }-${wrap.month}-${wrap.date}`;
+  const time = `${wrap.hour}:${wrap.minute}:${wrap.second}`;
+  return `${day} ${time}`;
+}
+
+
+/***************************************************************
  * Custom elements and element operations.
  ***************************************************************/
 
@@ -37,8 +75,10 @@ function showUnreadBadge($ele, subId) {
 
 function buildFeedSourceElement(sub) {
   const id = sub.id;
+
   // Let the anchor behave like normal ones without href.
   let $ele = $(`<a class="list-group-item">${sub.title}</a>`);
+
   // Reset globally focused element.
   if (globalObj.focusedFeedSource && globalObj.focusedFeedSource.id === id) {
     $ele.addClass('focused');
@@ -54,14 +94,18 @@ function buildFeedSourceElement(sub) {
     $ele.addClass('focused');
     globalObj.focusedFeedSource = { $ele, id };
   });
-  
+
   showUnreadBadge($ele, id);
   return $ele;
 }
 
 function buildFeedEntryElement(item) {
-  const id = item.id;
-  const title = item.title;
+  const { id, title, pubDate } = item;
+  const parsedDate = new Date(pubDate);
+  let displayDate = '';
+  if (isValidDate(parsedDate)) {
+    displayDate = formatDate(parsedDate);
+  }
   let keywords = item.keywords.split(',').join(', ');
 
   // Let the anchor behave like normal ones without href.
@@ -70,6 +114,7 @@ function buildFeedEntryElement(item) {
         <a class="list-group-item">
           <img class="pull-right" />
           <h5 class="list-group-item-heading">${title}</h5>
+          <p class="list-group-item-text feed-entry-date">${displayDate}</p>
           <p class="list-group-item-text feed-entry-keywords">${keywords}</p>
         </a>
       `);
@@ -166,11 +211,18 @@ function attachFeedSourceList() {
 function attachFeedEntries(subId) {
   return new Promise((resolve, reject) => {
     const done = data => {
-      const itemList = data.feeds.reduce((acc, item) => {
+
+      let feeds = [...data.feeds];
+      // Sorted by date, on top is the most recent. Invalid date won't change the order.
+      feeds.sort((e1, e2) => {
+        return new Date(e2.pubDate).getTime() - new Date(e1.pubDate).getTime();
+      });
+
+      const itemList = feeds.reduce((acc, item) => {
         return acc.add(buildFeedEntryElement(item));
       }, $());
 
-      updateUnreadCount(data.feeds.length);
+      updateUnreadCount(feeds.length);
 
       $('#feed-item-list-data')
         .empty()

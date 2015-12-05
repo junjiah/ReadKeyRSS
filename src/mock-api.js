@@ -9,6 +9,10 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
+function randomDate(start, end) {
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+}
+
 const apiStatus = Object.freeze({
   getSubscriptions: 200,
   getFeedEntries: 200,
@@ -32,7 +36,7 @@ const readKeyMockApi = Object.freeze({
 
     let subs = [];
     for (let i = 0; i < feedSourceNum; i++) {
-      subs.push({ id: i, title: `sub${i}` });
+      subs.push({ id: String(i), title: `sub${i}` });
     }
     setTimeout(done.bind(undefined, { subscriptions: subs }), latency);
   },
@@ -52,9 +56,10 @@ const readKeyMockApi = Object.freeze({
     let itemNum = subId == feedSourceNum - 1 ? 100 : subId;
     for (let i = 0; i < itemNum; i++) {
       items.push({
-        id: subId * 100 + i,
+        id: String(subId * 100 + i),
         title: `sub${subId}-item${i}`,
         keywords: `kw${i},keyword${i},关键词${i},キーワード${i}`,
+        pubDate: randomDate(new Date(2012, 0, 1), new Date()).toUTCString(),
       });
     }
     setTimeout(done.bind(undefined, { feeds: items }), latency);
@@ -92,8 +97,8 @@ const readKeyMockApi = Object.freeze({
 
     // Update number of feed sources.
     feedSourceNum++;
-    let id = feedSourceNum - 1;
-    const result = Object.freeze({ id: id, title: `sub${id}` });
+    let id = String(feedSourceNum - 1);
+    const result = Object.freeze({ id, title: `sub${id}` });
     setTimeout(done.bind(undefined, result), latency);
   },
 
