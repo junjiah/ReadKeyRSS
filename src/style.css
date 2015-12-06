@@ -11,13 +11,17 @@ hr {
 
 /* ReadKey styles. */
 
-#readkey-logo {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+#readkey-logo-div {
   margin-top: 48px;
   margin-bottom: 48px;
-  text-align: center;
+}
+
+#readkey-logo-img {
+  display: block;
+  margin: auto;
+  width: 80px;
+  height: 80px;
+  opacity: 0.7;
 }
 
 .feed-container {

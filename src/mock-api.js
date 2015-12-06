@@ -114,7 +114,7 @@ const readKeyMockApi = Object.freeze({
     setTimeout(done.bind(undefined, result), latency);
   },
 
-  markRead({subId, itemId, read}, done, fail) {
+  markRead(_, done, fail) {
     if (apiStatus.markRead != 200) {
       setTimeout(fail.bind(undefined, {
         responseText: 'markRead error.',
@@ -125,7 +125,7 @@ const readKeyMockApi = Object.freeze({
     setTimeout(done, latency);
   },
 
-  getUnreadCount({subId}, done, fail) {
+  getUnreadCount(_, done, fail) {
     if (apiStatus.getUnreadCount != 200) {
       setTimeout(fail.bind(undefined, {
         responseText: 'getUnreadCount error.',

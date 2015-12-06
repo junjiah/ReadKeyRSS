@@ -245,7 +245,7 @@ function attachFeedItem(feedId, feedTitle) {
   return new Promise((resolve, reject) => {
     const done = data => {
       const $titleEle = $(`<h1><a href="${data.link}" target="_blank">${feedTitle}</a></h1>`);
-      const $contentEle = $(data.content);
+      const $contentEle = $(`<div>${data.content}</div>`);
       // Let each link open in a new tab/window.
       $contentEle.find('a').attr('target', '_blank');
 
@@ -355,6 +355,10 @@ function refresh() {
  
 // When document is ready.
 $(() => {
+  // Attach logo.
+  let $logoImage = $('#readkey-logo-img');
+  $logoImage.attr('src', require('../assets/logo.png'));
+
   // Event handler for the subscription adding modal.
   $('#add-subscription-button').click(subscribe);
   $('#add-subscription-form').submit(subscribe);
