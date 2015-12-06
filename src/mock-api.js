@@ -10,7 +10,7 @@ function getRandomInt(min, max) {
 }
 
 function randomDate(start, end) {
-    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
 const apiStatus = Object.freeze({
@@ -52,15 +52,27 @@ const readKeyMockApi = Object.freeze({
 
     let items = [];
 
-    // Add one unusual feed source with 100 entries.
-    let itemNum = subId == feedSourceNum - 1 ? 100 : subId;
-    for (let i = 0; i < itemNum; i++) {
-      items.push({
-        id: String(subId * 100 + i),
-        title: `sub${subId}-item${i}`,
-        keywords: `kw${i},keyword${i},关键词${i},キーワード${i}`,
-        pubDate: randomDate(new Date(2012, 0, 1), new Date()).toUTCString(),
-      });
+    // Special feed item entries without keywords or time.
+    if (subId == feedSourceNum - 2) {
+      for (let i = 0; i < subId; i++) {
+        items.push({
+          id: String(subId * 100 + i),
+          title: `sub${subId}-item${i}-nokw-nodate`,
+          keywords: '',
+          pubDate: '',
+        });
+      }
+    } else {
+      // Another special feed item entries.
+      let itemNum = subId == feedSourceNum - 1 ? 100 : subId;
+      for (let i = 0; i < itemNum; i++) {
+        items.push({
+          id: String(subId * 100 + i),
+          title: `sub${subId}-item${i}`,
+          keywords: `kw${i},keyword${i},关键词${i},キーワード${i}`,
+          pubDate: randomDate(new Date(2012, 0, 1), new Date()).toUTCString(),
+        });
+      }
     }
     setTimeout(done.bind(undefined, { feeds: items }), latency);
   },

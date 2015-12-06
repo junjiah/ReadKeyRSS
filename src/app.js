@@ -24,8 +24,9 @@ const globalObj = {
 // Credits to: 
 // http://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript
 function isValidDate(date) {
-  if (Object.prototype.toString.call(date) !== "[object Date]")
+  if (Object.prototype.toString.call(date) !== '[object Date]') {
     return false;
+  }
   return !isNaN(date.getTime());
 }
 
@@ -300,7 +301,33 @@ function markAsRead({ itemId, $ele }) {
   return new Promise((resolve, reject) => {
     const done = () => {
       showLogoAsFeedContent();
-      $ele.remove();
+
+      // Define disappearing animations, which is related to the item height.
+      const height = $ele.css('height');
+      $.keyframe.define([{
+        name: 'feed-entry-disappear',
+        '0%': {
+          height,
+        },
+        '60%': {
+          transform: 'translateX(200%)',
+          '-webkit-transform': 'translateX(200%)',
+          height,
+          'padding-top': 0,
+          'padding-bottom': 0,
+        },
+        '100%': {
+          transform: 'translateX(200%)',
+          height: 0,
+          'padding-top': 0,
+          'padding-bottom': 0,
+        },
+      }]);
+      $ele.css('min-height', '0');
+      $ele.find('img').remove();
+      $ele.playKeyframe('feed-entry-disappear 1s ease-in-out', () => {
+        $ele.remove();
+      });
 
       updateUnreadCount($('#feed-item-list-data').children().length);
 
