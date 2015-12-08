@@ -2,6 +2,8 @@
 
 For now, it's a pixel-level copy of [Reeder for Mac](http://reederapp.com/mac/) for learning purposes.
 
+![readkeyrss-screenshot](http://i.imgur.com/mLHYh9Z.png)
+
 ## Credits
 
 Besides common libraries like [jQuery](https://jquery.com/) and [Bootstrap](http://getbootstrap.com/),
