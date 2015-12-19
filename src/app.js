@@ -60,20 +60,6 @@ function formatDate(date) {
  * Custom elements and element operations.
  ***************************************************************/
 
-function showUnreadBadge($ele, subId) {
-  const done = cnt => {
-    const len = Number(cnt);
-    const $badge = $ele.find('span.badge');
-    if ($badge.length == 0 && len > 0) {
-      $ele.append(`<span class="badge">${len}</span>`);
-    }
-    // TODO: If no unread item, should the feed source element be removed?
-  };
-  // Ignore errors.
-  const fail = () => { };
-  api.getUnreadCount({ subId }, done, fail);
-}
-
 function buildFeedSourceElement(sub) {
   const id = sub.id;
 
@@ -86,7 +72,11 @@ function buildFeedSourceElement(sub) {
     globalObj.focusedFeedSource.$ele = $ele;
   }
 
-  $ele.click(() => {
+  $ele.click((e) => {
+    // Ignore if is clicking remove button.
+    if (e.target.classList.contains('feed-source-remove')) {
+      return;
+    }
     showLogoAsFeedContent();
     attachFeedEntries(id);
     if (globalObj.focusedFeedSource) {
@@ -97,6 +87,29 @@ function buildFeedSourceElement(sub) {
   });
 
   showUnreadBadge($ele, id);
+  
+  // Add remove icon to unsubscribe. 
+  const $editIcon = $('<span class="glyphicon glyphicon-minus feed-source-remove" aria-hidden="false"></span>');
+  $editIcon.click(() => {
+    const done = () => {
+      $ele.find('span').fadeOut(500);
+      removeElementAnimated('feed-source-disappear', $ele);
+      if (globalObj.focusedFeedSource.id === id) {
+        $('#feed-item-list-data').empty();
+        $('#feed-title').empty();
+        $('#feed-content').empty();
+        globalObj.focusedFeedSource = null;
+        globalObj.focusedFeedEntry = null;
+      }
+    };
+    const fail = () => {
+      alert('unsubscribe failed.');
+    };
+    api.unsubscribeFeedSource(id, done, fail);
+  });
+
+  $ele.prepend($editIcon);
+
   return $ele;
 }
 
@@ -157,6 +170,20 @@ function showLogoAsFeedContent() {
   // TODO: Add logo.
 }
 
+function showUnreadBadge($ele, subId) {
+  const done = cnt => {
+    const len = Number(cnt);
+    const $badge = $ele.find('span.badge');
+    if ($badge.length == 0 && len > 0) {
+      $ele.append(`<span class="badge">${len}</span>`);
+    }
+    // TODO: If no unread item, should the feed source element be removed?
+  };
+  // Ignore errors.
+  const fail = () => { };
+  api.getUnreadCount({ subId }, done, fail);
+}
+
 function updateUnreadCount(len) {
   $('#feed-item-list-footer-info')
     .text(`${len} item${len > 1 ? 's' : ''}`);
@@ -177,11 +204,37 @@ function updateUnreadCount(len) {
   }
 }
 
+function removeElementAnimated(animationName, $ele) {
+  const height = $ele.css('height');
+  $.keyframe.define([{
+    name: animationName,
+    '0%': {
+      height,
+    },
+    '60%': {
+      transform: 'translateX(200%)',
+      '-webkit-transform': 'translateX(200%)',
+      height,
+      'padding-top': 0,
+      'padding-bottom': 0,
+    },
+    '100%': {
+      transform: 'translateX(200%)',
+      height: 0,
+      'padding-top': 0,
+      'padding-bottom': 0,
+    },
+  }]);
+  $ele.playKeyframe(`${animationName} 1s ease-in-out`, () => {
+    $ele.remove();
+  });
+}
+
 /***************************************************************
  * Custom events.
  ***************************************************************/
 
-// Executed on page ready.
+// Executed when refresh, fetch subscribed feed sources.
 function attachFeedSourceList() {
   return new Promise((resolve, reject) => {
     const done = subs => {
@@ -301,35 +354,12 @@ function markAsRead({ itemId, $ele }) {
   return new Promise((resolve, reject) => {
     const done = () => {
       showLogoAsFeedContent();
-
-      // Define disappearing animations, which is related to the item height.
-      const height = $ele.css('height');
-      $.keyframe.define([{
-        name: 'feed-entry-disappear',
-        '0%': {
-          height,
-        },
-        '60%': {
-          transform: 'translateX(200%)',
-          '-webkit-transform': 'translateX(200%)',
-          height,
-          'padding-top': 0,
-          'padding-bottom': 0,
-        },
-        '100%': {
-          transform: 'translateX(200%)',
-          height: 0,
-          'padding-top': 0,
-          'padding-bottom': 0,
-        },
-      }]);
+      const newUnreadCount = $('#feed-item-list-data').children().length - 1;
       $ele.css('min-height', '0');
-      $ele.find('img').remove();
-      $ele.playKeyframe('feed-entry-disappear 1s ease-in-out', () => {
-        $ele.remove();
-      });
+      $ele.find('img').fadeOut(500);
+      removeElementAnimated('feed-entry-disappear', $ele);
 
-      updateUnreadCount($('#feed-item-list-data').children().length);
+      updateUnreadCount(newUnreadCount);
 
       resolve();
     };
@@ -367,24 +397,23 @@ $(() => {
   });
   // Event handler for the refreshing button.
   $('#feed-source-list-refresh').click(refresh);
-  // Event handler for the mark read button.
-  $('#feed-item-mark-read').click(() => {
-    if (!globalObj.focusedFeedEntry) {
-      return;
+  // Event handler for subscription editing button.
+  $('#feed-source-list-edit').click(() => {
+    const $sources = $('#feed-source-list-data .feed-source-remove');
+    if ($sources.css('visibility') == 'hidden') {
+      $sources.css('visibility', 'visible');
+      $sources.fadeTo('slow', 1);
+    } else {
+      $sources.fadeTo('fast', 0, () => {
+        $sources.css('visibility', 'hidden');
+      });
     }
-    const feedEntry = {
-      itemId: globalObj.focusedFeedEntry.id,
-      $ele: globalObj.focusedFeedEntry.$ele,
-    };
-    globalObj.focusedFeedEntry = null;
-    markAsRead(feedEntry);
   });
 
-  // Adjust dynamic UI issues.
-  // TODO: Seems unstable.
-  const feedItemWidth = $(document).width() - $('.feed-item-list').width() - $('.feed-source-list').width();
-  $('#feed-item-header').width(feedItemWidth);
-  $('#feed-item-footer').width(feedItemWidth);
+  // Some dynamic css properties, e.g. the fixed header in feed content.
+  const leftSpace = $('.feed-source-list').width() + $('.feed-item-list').width();
+  $('#feed-item-header').css('left', `${leftSpace}px`);
+  $('#feed-item-footer').css('left', `${leftSpace}px`);
 
   // Init page loading.
   refresh();

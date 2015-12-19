@@ -24,7 +24,10 @@
       <div id="feed-source-list-data" class="list-group list-special borderless"></div>
       <footer id="feed-source-list-footer">
         <span id="feed-source-list-refresh" class="glyphicon glyphicon-refresh" aria-hidden="false"></span>
-        <span id="feed-source-list-add" class="glyphicon glyphicon-plus" aria-hidden="true" data-toggle="modal" data-target="#add-subscription-modal"></span>
+        <div id="feed-source-list-group-action">
+          <span id="feed-source-list-edit" class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+          <span id="feed-source-list-add" class="glyphicon glyphicon-plus" aria-hidden="true" data-toggle="modal" data-target="#add-subscription-modal"></span>
+        </div>
       </footer>
     </div>
     <div class="feed-item-list">
@@ -35,7 +38,8 @@
     </div>
     <div class="feed-item">
       <header id="feed-item-header">
-        <span id="feed-item-mark-read" class="glyphicon glyphicon-ok" aria-hidden="false"></span>
+        <span id="feed-item-star" class="glyphicon glyphicon-star" aria-hidden="true"></span>
+        <span id="feed-item-share" class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
       </header>
       <div id="feed-title"></div>
       <div id="feed-content"></div>

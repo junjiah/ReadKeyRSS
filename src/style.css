@@ -53,7 +53,16 @@ hr {
 }
 
 .feed-source-list .list-group-item {
-  padding-left: 15%;
+  padding-left: 8px;
+}
+
+.feed-source-list .feed-source-remove {
+  float: left;
+  padding-right: 8px;
+  color: darkred;
+  /* Toggled dynamically. */
+  visibility: hidden;
+  opacity: 0;
 }
 
 #feed-source-list-footer {
@@ -66,6 +75,11 @@ hr {
   width: 15em;
   height: 38px;
   border-top: 1px solid #DAD6C8;
+}
+
+#feed-source-list-group-action span:last-child {
+  /* Have some space between glyph icons. */
+  margin-left: 8px;
 }
 
 .feed-item-list, .feed-item-list .list-group-item, .feed-item-list footer {
@@ -108,7 +122,8 @@ hr {
 }
 
 #feed-title {
-  padding-top: 12px;
+  /* Take the header into consideration. */
+  padding-top: 50px;
   padding-bottom: 12px;
   margin-left: 18%;
   margin-right: 18%;
@@ -126,15 +141,19 @@ hr {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  padding: 9px;
+  position: fixed;
   top: 0px;
-  /* Set dynamically by jQuery. */
-  width: 0px;
+  right: 0px;
+  /* `left` was set dynamically by jQuery. */
   height: 38px;
   border-bottom: 1px solid #EBEAE9;
+  background: #F8F7F5;
+  opacity: 1;
 }
 
-#feed-item-mark-read {
-  margin-right: 36px;
+#feed-item-header * {
+  margin: 9px;
 }
 
 #feed-item-footer {
@@ -144,8 +163,8 @@ hr {
   position: fixed;
   padding: 12px;
   bottom: 0px;
-  /* Set dynamically by jQuery. */
-  width: 0px;
+  right: 0px;
+  /* `left` was set dynamically by jQuery. */
   height: 38px;
   border-top: 1px solid #EBEAE9;
   background: #F8F7F5;

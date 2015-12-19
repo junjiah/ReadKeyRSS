@@ -18,6 +18,7 @@ const apiStatus = Object.freeze({
   getFeedEntries: 200,
   getFeed: 200,
   subscribeFeedSource: 200,
+  unsubscribeFeedSource: 200,
   markRead: 200,
   getUnreadCount: 200,
 });
@@ -112,6 +113,19 @@ const readKeyMockApi = Object.freeze({
     let id = String(feedSourceNum - 1);
     const result = Object.freeze({ id, title: `sub${id}` });
     setTimeout(done.bind(undefined, result), latency);
+  },
+  
+  unsubscribeFeedSource(subId, done, fail) {
+    if (apiStatus.unsubscribeFeedSource != 200) {
+      setTimeout(fail.bind(undefined, {
+        responseText: 'unsubscribe error.',
+        status: apiStatus.unsubscribeFeedSource,
+      }), latency);
+      return;
+    }
+
+    feedSourceNum--;
+    setTimeout(done, latency);
   },
 
   markRead(_, done, fail) {

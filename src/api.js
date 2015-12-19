@@ -35,14 +35,21 @@ const readKeyApi = Object.freeze({
     }).done(done).fail(fail);
   },
 
+  unsubscribeFeedSource(subId, done, fail) {
+    $.ajax({
+      type: 'DELETE',
+      url: `${apiPrefix}/subscription/${subId}`,
+    }).done(done).fail(fail);
+  },
+
   markRead({subId, itemId, read}, done, fail) {
     $.ajax({
       type: 'PUT',
       url: `${apiPrefix}/subscription/${subId}`,
       data: `itemId=${itemId}&read=${read}`,
-    }).done(done).fail(fail);    
+    }).done(done).fail(fail);
   },
-  
+
   getUnreadCount({subId}, done, fail) {
     $.ajax({
       type: 'GET',
