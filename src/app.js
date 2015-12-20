@@ -64,7 +64,7 @@ function buildFeedSourceElement(sub) {
   const id = sub.id;
 
   // Let the anchor behave like normal ones without href.
-  let $ele = $(`<a class="list-group-item">${sub.title}</a>`);
+  let $ele = $(`<a class="list-group-item"><span class="feed-source-title">${sub.title}</span></a>`);
 
   // Reset globally focused element.
   if (globalObj.focusedFeedSource && globalObj.focusedFeedSource.id === id) {
@@ -166,8 +166,8 @@ function buildFeedEntryElement(item) {
 function showLogoAsFeedContent() {
   fadeOutThenEmpty($('#feed-title'));
   fadeOutThenEmpty($('#feed-content'));
+  $('#feed-item-readkey-logo-img').fadeIn(100);
   globalObj.focusedFeedEntry = null;
-  // TODO: Add logo.
 }
 
 function showUnreadBadge($ele, subId) {
@@ -310,6 +310,8 @@ function attachFeedEntries(subId) {
 
 // Event handler for clicking on feed entry.
 function attachFeedItem(feedId, feedTitle) {
+  // Dismiss the logo inside feed item section, and it's ok to dismiss even when it's already hidden.
+  $('#feed-item-readkey-logo-img').fadeOut(100);
   return new Promise((resolve, reject) => {
     const done = data => {
       const $titleEle = $(`<h1><a href="${data.link}" target="_blank">${feedTitle}</a></h1>`);
@@ -343,7 +345,7 @@ function attachFeedItem(feedId, feedTitle) {
 function subscribe(e) {
   e.preventDefault();
   const $inputEle = $('#add-subscription-input');
-  let url = $inputEle.val();
+  let url = $inputEle.val().trim();
   $('#add-subscription-modal').modal('hide');
   // TODO: Check whether the URL makes sense.
   return new Promise((resolve, reject) => {
@@ -448,8 +450,8 @@ function refresh() {
 // When document is ready.
 $(() => {
   // Attach logo.
-  let $logoImage = $('#readkey-logo-img');
-  $logoImage.attr('src', require('../assets/logo.png'));
+  $('#readkey-logo-img').attr('src', require('../assets/logo.png'));
+  $('#feed-item-readkey-logo-img').attr('src', require('../assets/book.png'));
 
   // Event handler for the subscription adding modal.
   $('#add-subscription-button').click(subscribe);

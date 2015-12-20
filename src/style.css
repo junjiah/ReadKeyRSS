@@ -54,6 +54,8 @@ hr {
 
 .feed-source-list .list-group-item {
   padding-left: 8px;
+  padding-top: 7.5px;
+  padding-bottom: 7.5px;
 }
 
 .feed-source-list .feed-source-remove {
@@ -63,6 +65,14 @@ hr {
   /* Toggled dynamically. */
   visibility: hidden;
   opacity: 0;
+}
+
+.feed-source-list .feed-source-title {
+  display: inline-block;
+  width: 9em;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 #feed-source-list-footer {
@@ -192,6 +202,14 @@ hr {
   margin-bottom: 12px !important;
 }
 
+#feed-item-readkey-logo-img {
+  display: block;
+  margin: auto;
+  margin-top: 100px;
+  width: 200px;
+  /*height: 100px;*/
+  opacity: 0.7;
+}
 
 /* Handle content styles. */
 
