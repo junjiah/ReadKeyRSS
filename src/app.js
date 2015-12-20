@@ -6,6 +6,7 @@ import 'babel-polyfill';
 
 // For local development.
 import api from './mock-api.js';
+import { shareTwitter, sharePocket } from './vendor/share.js';
 
 /***************************************************************
  * Global objects.
@@ -55,9 +56,8 @@ function formatDate(date) {
   return `${day} ${time}`;
 }
 
-
 /***************************************************************
- * Custom elements and element operations.
+ * Custom elements and UI procedures.
  ***************************************************************/
 
 function buildFeedSourceElement(sub) {
@@ -92,8 +92,9 @@ function buildFeedSourceElement(sub) {
   const $editIcon = $('<span class="glyphicon glyphicon-minus feed-source-remove" aria-hidden="false"></span>');
   $editIcon.click(() => {
     const done = () => {
-      $ele.find('span').fadeOut(500);
-      removeElementAnimated('feed-source-disappear', $ele);
+      $ele.slideUp(500, () => {
+        $ele.remove();
+      });
       if (globalObj.focusedFeedSource.id === id) {
         $('#feed-item-list-data').empty();
         $('#feed-title').empty();
@@ -120,7 +121,7 @@ function buildFeedEntryElement(item) {
   if (isValidDate(parsedDate)) {
     displayDate = formatDate(parsedDate);
   }
-  let keywords = item.keywords.split(',').join(', ');
+  const keywords = item.keywords.split(',').join(', ');
 
   // Let the anchor behave like normal ones without href.
   // TODO: Center the checkmark.
@@ -167,6 +168,7 @@ function showLogoAsFeedContent() {
     .empty();
   $('#feed-content')
     .empty();
+  globalObj.focusedFeedEntry = null;
   // TODO: Add logo.
 }
 
@@ -320,6 +322,7 @@ function attachFeedItem(feedId, feedTitle) {
   });
 }
 
+// Subscribe to a feed source after inputting the desired URL.
 function subscribe(e) {
   e.preventDefault();
   const $inputEle = $('#add-subscription-input');
@@ -355,9 +358,9 @@ function markAsRead({ itemId, $ele }) {
     const done = () => {
       showLogoAsFeedContent();
       const newUnreadCount = $('#feed-item-list-data').children().length - 1;
-      $ele.css('min-height', '0');
       $ele.find('img').fadeOut(500);
       removeElementAnimated('feed-entry-disappear', $ele);
+      $ele.css('min-height', '0');
 
       updateUnreadCount(newUnreadCount);
 
@@ -371,12 +374,51 @@ function markAsRead({ itemId, $ele }) {
   });
 }
 
+function share(e) {
+  e.stopPropagation();
+  // Ignore if no currently focused feed item.
+  if (globalObj.focusedFeedEntry == null) {
+    return;
+  }
+
+  const $dropdown = $('#feed-item-share-dropdown');
+  const alreadyOpen = $dropdown.parent()[0].classList.contains('open');
+  // Toggle and return if already open.
+  if (alreadyOpen) {
+    $dropdown.dropdown('toggle');
+    return;
+  }
+
+  $dropdown.empty();
+
+  // Get the link to the focused article.
+  const $titleEle = $('#feed-title a');
+  const link = $titleEle.attr('href');
+  const title = $titleEle.text();
+  // Populate the link to sharing buttons.
+  $dropdown.append(`
+    <li>
+      <a class="twitter-share-button" 
+        href="https://twitter.com/intent/tweet" 
+        data-url="${link}"
+        data-text="「${title}」, shared from ReadKey" />
+    </li>
+    <li>
+      <a data-pocket-label="pocket" data-pocket-count="none" data-save-url="${link}" class="pocket-btn" data-lang="en" />
+    </li>
+  `);
+  // Render the button using vendor scripts.
+  shareTwitter();
+  sharePocket();
+  // Wait some time for rendering share button.
+  setTimeout(() => $dropdown.dropdown('toggle'), 500);
+}
+
 /***************************************************************
  * Preparation when document is ready.
  ***************************************************************/
 
 function refresh() {
-  console.log('refresh');
   attachFeedSourceList();
   if (globalObj.focusedFeedSource) {
     attachFeedEntries(globalObj.focusedFeedSource.id);
@@ -409,11 +451,15 @@ $(() => {
       });
     }
   });
+  // Event handler for the sharing button.
+  $('#feed-item-share').click(share);
 
-  // Some dynamic css properties, e.g. the fixed header in feed content.
-  const leftSpace = $('.feed-source-list').width() + $('.feed-item-list').width();
-  $('#feed-item-header').css('left', `${leftSpace}px`);
-  $('#feed-item-footer').css('left', `${leftSpace}px`);
+  // Some dynamic css properties, e.g. the fixed header in feed content, load after a short period.
+  setTimeout(() => {
+    const leftSpace = $('.feed-source-list').width() + $('.feed-item-list').width();
+    $('#feed-item-header').css('left', `${leftSpace}px`);
+    $('#feed-item-footer').css('left', `${leftSpace}px`);
+  }, 100);
 
   // Init page loading.
   refresh();

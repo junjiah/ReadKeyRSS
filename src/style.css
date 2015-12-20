@@ -152,14 +152,14 @@ hr {
   opacity: 1;
 }
 
-#feed-item-header * {
+#feed-item-header > * {
   margin: 9px;
 }
 
 #feed-item-footer {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   position: fixed;
   padding: 12px;
   bottom: 0px;
@@ -169,6 +169,26 @@ hr {
   border-top: 1px solid #EBEAE9;
   background: #F8F7F5;
   opacity: 0.8;
+}
+
+#feed-item-share-dropdown {
+  padding: 0;
+  min-width: 0;
+  background: #F0F0F0;
+}
+
+#feed-item-share-dropdown li {
+  margin: 6px 12px !important;
+  width: 68px !important;
+  height: 20px !important;
+}
+
+#feed-item-share-dropdown li:first-child {
+  margin-top: 12px !important;
+}
+
+#feed-item-share-dropdown li:last-child {
+  margin-bottom: 12px !important;
 }
 
 
