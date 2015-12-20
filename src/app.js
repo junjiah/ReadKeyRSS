@@ -6,7 +6,7 @@ import 'babel-polyfill';
 
 // For local development.
 import api from './mock-api.js';
-import { shareTwitter, sharePocket } from './vendor/share.js';
+import { renderTwitterShare, renderPocketShare } from './vendor/share.js';
 
 /***************************************************************
  * Global objects.
@@ -96,9 +96,9 @@ function buildFeedSourceElement(sub) {
         $ele.remove();
       });
       if (globalObj.focusedFeedSource.id === id) {
-        $('#feed-item-list-data').empty();
-        $('#feed-title').empty();
-        $('#feed-content').empty();
+        fadeOutThenEmpty($('#feed-item-list-data'));
+        fadeOutThenEmpty($('#feed-title'));
+        fadeOutThenEmpty($('#feed-content'));
         globalObj.focusedFeedSource = null;
         globalObj.focusedFeedEntry = null;
       }
@@ -144,14 +144,14 @@ function buildFeedEntryElement(item) {
     if (e.target.tagName == 'IMG') {
       // Clicking the checkmark, mark as read.
       markAsRead({ itemId: id, $ele });
-      // Remove global record if matches.
-      if (globalObj.focusedFeedEntry && globalObj.focusedFeedEntry.id === id) {
-        globalObj.focusedFeedEntry = null;
-      }
       return;
     }
     
     // Otherwise, regard as normal clicking to attach feed item.
+    if (globalObj.focusedFeedEntry && globalObj.focusedFeedEntry.id === id) {
+      // Ignore if already focused.
+      return;
+    }
     // TODO: Maybe these should be fetched before clicking.
     attachFeedItem(id, title);
     if (globalObj.focusedFeedEntry) {
@@ -164,10 +164,8 @@ function buildFeedEntryElement(item) {
 }
 
 function showLogoAsFeedContent() {
-  $('#feed-title')
-    .empty();
-  $('#feed-content')
-    .empty();
+  fadeOutThenEmpty($('#feed-title'));
+  fadeOutThenEmpty($('#feed-content'));
   globalObj.focusedFeedEntry = null;
   // TODO: Add logo.
 }
@@ -232,6 +230,20 @@ function removeElementAnimated(animationName, $ele) {
   });
 }
 
+function fadeOutThenEmpty($ele, time = 300) {
+  return new Promise(resolve => {
+    const children = $ele.children();
+    if (children.length == 0) {
+      resolve($ele);
+    } else {
+      children.fadeOut(time, () => {
+        $ele.empty();
+        resolve($ele);
+      });
+    }
+  });
+}
+
 /***************************************************************
  * Custom events.
  ***************************************************************/
@@ -280,9 +292,10 @@ function attachFeedEntries(subId) {
 
       updateUnreadCount(feeds.length);
 
-      $('#feed-item-list-data')
-        .empty()
-        .append(itemList);
+      fadeOutThenEmpty($('#feed-item-list-data'), 100)
+        .then(($ele) => {
+          $ele.fadeToggle(0).append(itemList).fadeToggle(100);
+        });
 
       resolve();
     };
@@ -304,12 +317,15 @@ function attachFeedItem(feedId, feedTitle) {
       // Let each link open in a new tab/window.
       $contentEle.find('a').attr('target', '_blank');
 
-      $('#feed-title')
-        .empty()
-        .append($titleEle);
-      $('#feed-content')
-        .empty()
-        .append($contentEle);
+      fadeOutThenEmpty($('#feed-title'), 100)
+        .then(($ele) => {
+          $ele.fadeToggle(0).append($titleEle).fadeToggle(100);
+        });
+
+      fadeOutThenEmpty($('#feed-content'), 100)
+        .then(($ele) => {
+          $ele.fadeToggle(0).append($contentEle).fadeToggle(100);
+        });
 
       resolve();
     };
@@ -356,7 +372,10 @@ function markAsRead({ itemId, $ele }) {
 
   return new Promise((resolve, reject) => {
     const done = () => {
-      showLogoAsFeedContent();
+      if (globalObj.focusedFeedEntry && globalObj.focusedFeedEntry.id === itemId) {
+        showLogoAsFeedContent();
+      }
+
       const newUnreadCount = $('#feed-item-list-data').children().length - 1;
       $ele.find('img').fadeOut(500);
       removeElementAnimated('feed-entry-disappear', $ele);
@@ -398,8 +417,8 @@ function share(e) {
   // Populate the link to sharing buttons.
   $dropdown.append(`
     <li>
-      <a class="twitter-share-button" 
-        href="https://twitter.com/intent/tweet" 
+      <a class="twitter-share-button"
+        href="https://twitter.com/intent/tweet"
         data-url="${link}"
         data-text="「${title}」, shared from ReadKey" />
     </li>
@@ -408,9 +427,9 @@ function share(e) {
     </li>
   `);
   // Render the button using vendor scripts.
-  shareTwitter();
-  sharePocket();
-  // Wait some time for rendering share button.
+  renderTwitterShare();
+  renderPocketShare();
+  // Wait some time for rendering.
   setTimeout(() => $dropdown.dropdown('toggle'), 500);
 }
 
