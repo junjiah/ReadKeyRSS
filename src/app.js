@@ -256,13 +256,13 @@ function attachFeedSourceList() {
       if (!subs.subscriptions) {
         return;
       }
-      const subList = subs.subscriptions.reduce((acc, sub) => {
+      const $subList = subs.subscriptions.reduce((acc, sub) => {
         return acc.add(buildFeedSourceElement(sub));
       }, $());
 
       $('#feed-source-list-data')
         .empty()
-        .append(subList);
+        .append($subList);
 
       resolve();
     };
@@ -286,7 +286,7 @@ function attachFeedEntries(subId) {
         return new Date(e2.pubDate).getTime() - new Date(e1.pubDate).getTime();
       });
 
-      const itemList = feeds.reduce((acc, item) => {
+      const $itemList = feeds.reduce((acc, item) => {
         return acc.add(buildFeedEntryElement(item));
       }, $());
 
@@ -294,7 +294,7 @@ function attachFeedEntries(subId) {
 
       fadeOutThenEmpty($('#feed-item-list-data'), 100)
         .then(($ele) => {
-          $ele.fadeToggle(0).append(itemList).fadeToggle(100);
+          $ele.fadeToggle(0).append($itemList).fadeToggle(100);
         });
 
       resolve();
@@ -319,12 +319,13 @@ function attachFeedItem(feedId, feedTitle) {
 
       fadeOutThenEmpty($('#feed-title'), 100)
         .then(($ele) => {
-          $ele.fadeToggle(0).append($titleEle).fadeToggle(100);
+          $ele.append($titleEle.fadeToggle(0).fadeToggle(100));
         });
 
       fadeOutThenEmpty($('#feed-content'), 100)
         .then(($ele) => {
-          $ele.fadeToggle(0).append($contentEle).fadeToggle(100);
+          $ele.scrollTop(0);
+          $ele.append($contentEle.fadeToggle(0).fadeToggle(100));
         });
 
       resolve();

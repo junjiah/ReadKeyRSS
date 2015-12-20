@@ -150,6 +150,7 @@ hr {
   border-bottom: 1px solid #EBEAE9;
   background: #F8F7F5;
   opacity: 1;
+  z-index: 1;
 }
 
 #feed-item-header > * {
