@@ -1,5 +1,4 @@
 import argparse
-
 import time
 
 # Credits to:
