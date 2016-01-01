@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Login | Read Key</title>
+  <!-- Auth0Lock script -->
+  <script src="//cdn.auth0.com/js/lock-7.12.min.js"></script>
+  <script type="text/javascript">
+    var lock = new Auth0Lock('jytqK7OzsMPly8E2iN3kix9wcgeWptxc', 'edfward.auth0.com');
+    function login() {
+      lock.show({
+        // TODO: This is for backend.
+        callbackURL: 'http://localhost:8080/callback',
+        responseType: 'code',
+        authParams: {
+          scope: 'openid'
+        }
+      });
+    };
+    
+    window.onload = login;
+  </script>
+</head>
+
+<body></body>

@@ -2,7 +2,7 @@ module.exports = {
   context: __dirname + '/src',
   entry: {
     javascript: './app.js',
-    html: './index.html',
+    html: ['./index.html', './login.html'],
     css: './style.css',
   },
 
@@ -27,7 +27,7 @@ module.exports = {
       },
       {
         test: /\.svg$|\.png$/,
-        loader: 'file-loader',
+        loader: 'file?name=assets/[name].[ext]',
       },
     ],
   },

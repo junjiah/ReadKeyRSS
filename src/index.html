@@ -40,10 +40,16 @@
       <header id="feed-item-header">
         <!-- TODO: 'Favorite' not supported yet. -->
         <!--<span id="feed-item-star" class="glyphicon glyphicon-star" aria-hidden="true"></span>-->
-
-        <span id="feed-item-share" class="glyphicon glyphicon-share-alt" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false"></span>
-        <ul id="feed-item-share-dropdown" class="dropdown-menu dropdown-menu-right" aria-labelledby="feed-item-share">
-        </ul>
+        <div class="dropdown">
+          <span id="preference-setting" class="glyphicon glyphicon-user" data-toggle="dropdown" aria-haspopup="false"></span>
+          <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="preference-setting">
+            <li><a href="/logout">Logout</a></li>
+          </ul>
+        </div>
+        <div class="dropdown">
+          <span id="feed-item-share" class="glyphicon glyphicon-share-alt" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false"></span>
+          <ul id="feed-item-share-dropdown" class="dropdown-menu dropdown-menu-right" aria-labelledby="feed-item-share"></ul>
+        </div>
       </header>
       <div id="feed-title"></div>
       <div id="feed-content"></div>

@@ -167,6 +167,12 @@ hr {
   margin: 9px;
 }
 
+#feed-item-header .dropdown-menu {
+  padding: 0;
+  min-width: 0;
+  background: #F0F0F0;  
+}
+
 #feed-item-footer {
   display: flex;
   justify-content: center;
@@ -180,12 +186,6 @@ hr {
   border-top: 1px solid #EBEAE9;
   background: #F8F7F5;
   opacity: 0.8;
-}
-
-#feed-item-share-dropdown {
-  padding: 0;
-  min-width: 0;
-  background: #F0F0F0;
 }
 
 #feed-item-share-dropdown li {

@@ -347,22 +347,22 @@ function subscribe(e) {
   const $inputEle = $('#add-subscription-input');
   let url = $inputEle.val().trim();
   $('#add-subscription-modal').modal('hide');
-  // TODO: Check whether the URL makes sense.
-  return new Promise((resolve, reject) => {
-    const done = sub => {
-      // Clear input's value.
-      $inputEle.val('');
-      $('#feed-source-list-data')
-        .append(buildFeedSourceElement(sub));
-
-      resolve();
-    };
-    const fail = () => {
-      alert('subscribe failed.');
-      reject();
-    };
-    api.subscribeFeedSource(url, done, fail);
-  });
+  const done = sub => {
+    // Clear input's value.
+    $inputEle.val('');
+    $('#feed-source-list-data')
+      .append(buildFeedSourceElement(sub));
+  };
+  const fail = jqXHR => {
+    let msg;
+    if (jqXHR.responseText) {
+      msg = JSON.parse(jqXHR.responseText).error;
+    } else {
+      msg = 'subscribe failed';
+    }
+    alert(msg);
+  };
+  api.subscribeFeedSource(url, done, fail);
 }
 
 function markAsRead({ itemId, $ele }) {
