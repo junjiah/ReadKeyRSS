@@ -1,8 +1,17 @@
-# Readkey Reader
+# ReadkeyRSS Reader
 
-For now, it's a pixel-level copy of [Reeder for Mac](http://reederapp.com/mac/) for learning purposes.
+For now, it's a pixel-level copy of [Reeder for Mac](http://reederapp.com/mac/) for learning purposes, developed using ES6.
 
-![readkeyrss-screenshot](http://i.imgur.com/mLHYh9Z.png)
+![readkeyrss-screenshot](http://i.imgur.com/iTjXjLH.png)
+
+## Introduction
+The basic functionalities include:
+
+- Subscribe to a feed source (RSS/Atom) and start receiving latest feeds.
+- Find every feed's keywords without reading its content. ([ReadKeyWord](https://github.com/EDFward/ReadKeyWord))
+- Mark feeds as read.
+
+For details of the backend server, check [ReadKeyServer repo](https://github.com/EDFward/ReadKeyServer).
 
 ## Credits
 
