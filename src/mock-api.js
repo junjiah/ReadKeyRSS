@@ -21,6 +21,7 @@ const apiStatus = Object.freeze({
   unsubscribeFeedSource: 200,
   markRead: 200,
   getUnreadCount: 200,
+  markAllAsRead: 200,
 });
 const latency = 100;
 let feedSourceNum = 10;
@@ -134,6 +135,7 @@ const readKeyMockApi = Object.freeze({
         responseText: 'markRead error.',
         status: apiStatus.markRead,
       }), latency);
+      return;
     }
 
     setTimeout(done, latency);
@@ -150,6 +152,18 @@ const readKeyMockApi = Object.freeze({
 
     const result = getRandomInt(0, 5);
     setTimeout(done.bind(undefined, String(result)), latency);
+  },
+  
+  markAllAsRead(_, done, fail) {
+    if (apiStatus.markAllAsRead != 200) {
+      setTimeout(fail.bind(undefined, {
+        responseText: 'markAllAsRead error.',
+        status: apiStatus.markAllAsRead,
+      }), latency);
+      return;
+    }
+
+    setTimeout(done, latency);
   },
 });
 

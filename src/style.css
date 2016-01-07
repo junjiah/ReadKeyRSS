@@ -8,6 +8,10 @@ hr {
   border-top: 2px solid #ccc;
 }
 
+.glyphicon {
+  /* Make them look slightly friendlier. */
+  cursor: pointer;
+}
 
 /* ReadKey styles. */
 
@@ -99,7 +103,7 @@ hr {
 #feed-item-list-footer {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   position: fixed;
   padding: 12px;
   bottom: 0px;
@@ -108,8 +112,12 @@ hr {
   border-top: 1px solid #EBEAE9;
 }
 
-#feed-item-list-footer-info {
+#feed-item-list-info {
   font-size: 8px;
+}
+
+#feed-item-list-markall {
+  font-size: 18px;
 }
 
 .feed-item-list .list-group-item {

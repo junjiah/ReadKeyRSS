@@ -46,14 +46,22 @@ const readKeyApi = Object.freeze({
     $.ajax({
       type: 'PUT',
       url: `${apiPrefix}/subscription/${subId}`,
-      data: `itemId=${itemId}&read=${read}`,
+      data: `itemId=${itemId}&read=${read}&markAll=false`,
     }).done(done).fail(fail);
   },
 
-  getUnreadCount({subId}, done, fail) {
+  getUnreadCount(subId, done, fail) {
     $.ajax({
       type: 'GET',
       url: `${apiPrefix}/unreadcount/${subId}`,
+    }).done(done).fail(fail);
+  },
+  
+  markAllAsRead(subId, done, fail) {
+    $.ajax({
+      type: 'PUT',
+      url: `${apiPrefix}/subscription/${subId}`,
+      data: 'markAll=true', 
     }).done(done).fail(fail);
   },
 });

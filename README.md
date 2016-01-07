@@ -1,4 +1,4 @@
-# ReadkeyRSS Reader
+# ReadKeyRSS Reader
 
 For now, it's a pixel-level copy of [Reeder for Mac](http://reederapp.com/mac/) for learning purposes, developed using ES6.
 

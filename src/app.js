@@ -181,11 +181,11 @@ function showUnreadBadge($ele, subId) {
   };
   // Ignore errors.
   const fail = () => { };
-  api.getUnreadCount({ subId }, done, fail);
+  api.getUnreadCount(subId, done, fail);
 }
 
 function updateUnreadCount(len) {
-  $('#feed-item-list-footer-info')
+  $('#feed-item-list-info')
     .text(`${len} item${len > 1 ? 's' : ''}`);
   if (globalObj.focusedFeedSource) {
     const $ele = globalObj.focusedFeedSource.$ele;
@@ -280,7 +280,13 @@ function attachFeedEntries(subId) {
   return new Promise((resolve, reject) => {
     const done = data => {
 
-      let feeds = [...data.feeds];
+      let feeds;
+      if (data.feeds === null) {
+        // In Go, empty slice may be marshalled as null.
+        feeds = [];
+      } else {
+        feeds = [...data.feeds];
+      }
       // Sorted by date, on top is the most recent. Invalid date won't change the order.
       feeds.sort((e1, e2) => {
         return new Date(e2.pubDate).getTime() - new Date(e1.pubDate).getTime();
@@ -396,6 +402,26 @@ function markAsRead({ itemId, $ele }) {
   });
 }
 
+function markAllAsRead() {
+  // Ignore if no focused feed source.
+  if (!globalObj.focusedFeedSource) {
+    return;
+  }
+
+  // Seems no need to use promises.
+  const subId = globalObj.focusedFeedSource.id;
+  const done = () => {
+    showLogoAsFeedContent();
+    let $feedItemListItems = $('#feed-item-list-data > a.list-group-item');
+    removeElementAnimated("feed-entry-disappear-all", $feedItemListItems);
+    updateUnreadCount(0);
+  };
+  const fail = () => {
+    alert("mark all as read failed.")
+  };
+  api.markAllAsRead(subId, done, fail);
+}
+
 function share(e) {
   e.stopPropagation();
   // Ignore if no currently focused feed item.
@@ -475,6 +501,8 @@ $(() => {
   });
   // Event handler for the sharing button.
   $('#feed-item-share').click(share);
+  // Event handler for marking all as read.
+  $('#feed-item-list-markall').click(markAllAsRead);
 
   // Some dynamic css properties, e.g. the fixed header in feed content, load after a short period.
   setTimeout(() => {
