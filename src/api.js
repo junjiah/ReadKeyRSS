@@ -8,9 +8,7 @@ const readKeyApi = Object.freeze({
     $.ajax({
       type: 'GET',
       url: `${apiPrefix}/subscription`,
-    }).done(data => {
-      done(data);
-    }).fail(fail);
+    }).done(done).fail(fail);
   },
 
   getFeedEntries(subId, done, fail) {

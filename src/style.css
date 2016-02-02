@@ -13,6 +13,7 @@ hr {
   cursor: pointer;
 }
 
+
 /* ReadKey styles. */
 
 #readkey-logo-div {
@@ -178,7 +179,7 @@ hr {
 #feed-item-header .dropdown-menu {
   padding: 0;
   min-width: 0;
-  background: #F0F0F0;  
+  background: #F0F0F0;
 }
 
 #feed-item-footer {
@@ -197,17 +198,23 @@ hr {
 }
 
 #feed-item-share-dropdown li {
-  margin: 6px 12px !important;
-  width: 68px !important;
-  height: 20px !important;
+  margin: 6px 12px;
 }
 
-#feed-item-share-dropdown li:first-child {
-  margin-top: 12px !important;
+ul.share-buttons {
+  list-style: none;
+  padding: 0;
 }
 
-#feed-item-share-dropdown li:last-child {
-  margin-bottom: 12px !important;
+ul.share-buttons a {
+  text-decoration: none;
+  font-weight: 700;
+  color: #444;
+  transition: color 200ms ease-in-out;
+}
+
+ul.share-buttons a:hover {
+  color: cadetblue;
 }
 
 #feed-item-readkey-logo-img {
@@ -217,6 +224,7 @@ hr {
   width: 200px;
   opacity: 0.3;
 }
+
 
 /* Handle content styles. */
 

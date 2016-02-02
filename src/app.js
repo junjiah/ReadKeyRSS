@@ -6,7 +6,6 @@ import 'babel-polyfill';
 
 // For local development.
 import api from './mock-api.js';
-import { renderTwitterShare, renderPocketShare } from './vendor/share.js';
 
 /***************************************************************
  * Global objects.
@@ -413,11 +412,11 @@ function markAllAsRead() {
   const done = () => {
     showLogoAsFeedContent();
     let $feedItemListItems = $('#feed-item-list-data > a.list-group-item');
-    removeElementAnimated("feed-entry-disappear-all", $feedItemListItems);
+    removeElementAnimated('feed-entry-disappear-all', $feedItemListItems);
     updateUnreadCount(0);
   };
   const fail = () => {
-    alert("mark all as read failed.")
+    alert('mark all as read failed.');
   };
   api.markAllAsRead(subId, done, fail);
 }
@@ -444,22 +443,15 @@ function share(e) {
   const link = $titleEle.attr('href');
   const title = $titleEle.text();
   // Populate the link to sharing buttons.
+  // Credits to https://simplesharingbuttons.com/
   $dropdown.append(`
-    <li>
-      <a class="twitter-share-button"
-        href="https://twitter.com/intent/tweet"
-        data-url="${link}"
-        data-text="「${title}」, shared from ReadKey" />
-    </li>
-    <li>
-      <a data-pocket-label="pocket" data-pocket-count="none" data-save-url="${link}" class="pocket-btn" data-lang="en" />
-    </li>
+    <ul class="share-buttons">
+      <li><a href="https://twitter.com/intent/tweet?source=readkey&text=「${encodeURIComponent(title)}」, shared from ReadKey: ${encodeURIComponent(link)}" target="_blank" title="Tweet" onclick="window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('「${title}」, shared from ReadKey: ') + encodeURIComponent('${link}')); return false;">Twitter</a></li>
+      <li><a href="https://getpocket.com/save?url=${link}&title=${title}" target="_blank" title="Add to Pocket" onclick="window.open('https://getpocket.com/save?url=' + encodeURIComponent('${link}') + '&title=' +  encodeURIComponent('${title}')); return false;">Pocket</a></li>
+    </ul>
   `);
-  // Render the button using vendor scripts.
-  renderTwitterShare();
-  renderPocketShare();
-  // Wait some time for rendering.
-  setTimeout(() => $dropdown.dropdown('toggle'), 500);
+
+  $dropdown.dropdown('toggle');
 }
 
 /***************************************************************
